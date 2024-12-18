@@ -16,9 +16,9 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <BrowserRouter>
+            <BrowserRouter> <SnackbarProvider>
                 <AuthProvider>
-                    <SnackbarProvider>
+
                         <Routes>
                             <Route path="/login" element={<Login />} />
                             <Route path="/dashboard" element={
@@ -35,8 +35,8 @@ function App() {
                             </Route>
                             <Route path="/" element={<Navigate to="/dashboard" replace />} />
                         </Routes>
-                    </SnackbarProvider>
-                </AuthProvider>
+
+                </AuthProvider> </SnackbarProvider>
             </BrowserRouter>
         </ThemeProvider>
     );
