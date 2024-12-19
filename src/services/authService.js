@@ -4,7 +4,6 @@ const API_URL = 'http://localhost:8000/api/v1';
 
 const authService = {
     login: async (email, password) => {
-        try {
             const response = await axios.post(`${API_URL}/auth/login`,
                 new URLSearchParams({
                     'username': email,
@@ -14,26 +13,18 @@ const authService = {
                 }
             );
             return response.data;
-        } catch (error) {
-            // De nuevo lanzamos el error para manejarlo en el componente
-            throw error;
-        }
     },
 
     getMe: async () => {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No hay token de autenticación');
-            }
-
-            const response = await axios.get(`${API_URL}/auth/me`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No authentication token');
         }
+
+        const response = await axios.get(`${API_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        return response.data;
     },
 
     logout: async () => {
@@ -62,9 +53,8 @@ const authService = {
         }
     },
 
-    // Método para verificar si el usuario está autenticado
     isAuthenticated: () => {
-        return !!localStorage.getItem('token');
+        return Boolean(localStorage.getItem('token'));
     }
 };
 
@@ -72,11 +62,13 @@ const authService = {
 axios.interceptors.response.use(
     response => response,
     error => {
-      if (error.response?.status === 401) {
-        authService.logout();
-        window.location.href = '/login';
-      }
-      return Promise.reject(error);
+        // Si es 401 y NO es una petición de logout
+        if (error.response?.status === 401 && !error.config.url.includes('/auth/logout')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
     }
 );
 

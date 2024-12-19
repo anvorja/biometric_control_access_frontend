@@ -26,7 +26,7 @@ export const UserList = () => {
         const fetchUsers = async () => {
             try {
                 const data = await userService.getUsers();
-                console.log('Users data:', data);
+                //console.log('Users data:', data);
                 setUsers(data);
             } catch (error) {
                 console.error('Error fetching users:', error);

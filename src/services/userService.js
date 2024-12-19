@@ -18,7 +18,8 @@ export const userService = {
     createUser: async (userData) => {
         const response = await axios.post(
             `${API_URL}/register`,
-            userData, getHeaders());
+            userData,
+            getHeaders());
         return response.data;
     },
 
