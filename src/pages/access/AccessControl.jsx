@@ -18,35 +18,6 @@ export const AccessControl = () => {
         }
     };
 
-//     return (
-//         <Grid container spacing={3} justifyContent="center">
-//             <Grid item xs={12} md={6}>
-//                 <Card sx={{ p: 4, textAlign: 'center' }}>
-//                     <FingerprintIcon sx={{ fontSize: 60, mb: 2 }} />
-//                     <Typography variant="h5" gutterBottom>Control de Acceso</Typography>
-//                     <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'center' }}>
-//                         <Button
-//                             variant="contained"
-//                             color="primary"
-//                             disabled={verifying}
-//                             onClick={() => handleVerification('entry')}
-//                         >
-//                             Registrar Entrada
-//                         </Button>
-//                         <Button
-//                             variant="contained"
-//                             color="secondary"
-//                             disabled={verifying}
-//                             onClick={() => handleVerification('exit')}
-//                         >
-//                             Registrar Salida
-//                         </Button>
-//                     </Box>
-//                 </Card>
-//             </Grid>
-//         </Grid>
-//     );
-// };
     return (
         <Container maxWidth="md" sx={{ mt: 4 }}>
             <Grid container justifyContent="center">
