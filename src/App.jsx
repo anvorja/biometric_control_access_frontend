@@ -11,14 +11,16 @@ import {Reports} from "./pages/reports/Reports.jsx";
 import {AuthProvider} from "./context/AuthContext.jsx";
 import {PrivateRoute} from "./components/PrivateRoute.jsx";
 import {SnackbarProvider} from "./components/common/Snackbar.jsx";
+import {UserEdit} from "./pages/users/UserEdit.jsx";
+import {UserFingerprint} from "./pages/users/UserFingerprint.jsx";
 
 function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <BrowserRouter> <SnackbarProvider>
-                <AuthProvider>
-
+            <BrowserRouter>
+                <SnackbarProvider>
+                    <AuthProvider>
                         <Routes>
                             <Route path="/login" element={<Login />} />
                             <Route path="/dashboard" element={
@@ -29,14 +31,16 @@ function App() {
                                 <Route index element={<Navigate to="users" replace />} />
                                 <Route path="users" element={<UserList />} />
                                 <Route path="users/new" element={<UserForm />} />
+                                <Route path="users/edit/:id" element={<UserEdit />} />
+                                <Route path="users/fingerprint/:id" element={<UserFingerprint />} />
                                 <Route path="access" element={<AccessControl />} />
                                 <Route path="access/history" element={<AccessHistory />} />
                                 <Route path="reports" element={<Reports />} />
                             </Route>
                             <Route path="/" element={<Navigate to="/dashboard" replace />} />
                         </Routes>
-
-                </AuthProvider> </SnackbarProvider>
+                    </AuthProvider>
+                </SnackbarProvider>
             </BrowserRouter>
         </ThemeProvider>
     );
