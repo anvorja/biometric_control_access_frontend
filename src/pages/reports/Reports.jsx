@@ -529,12 +529,13 @@ export const Reports = () => {
                         loading={loading}
                         variant="contained"
                         onClick={handleExport}
-                        disabled={canPerformAction()}
+                        disabled={!canPerformAction()}
                     >
                         Exportar PDF
                     </LoadingButton>
                 </DialogActions>
-            </Dialog>        {/* Snackbar para mensajes */}
+            </Dialog>
+            {/* Snackbar para mensajes */}
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}
