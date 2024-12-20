@@ -2,22 +2,59 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/v1';
 
+const axiosInstance = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+// Interceptor para añadir el token automáticamente
+axiosInstance.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export const accessService = {
 
+    checkRecords: async (filters = {}) => {
+        try {
+            const queryParams = new URLSearchParams();
+
+            if (filters.start_date) queryParams.append('start_date', filters.start_date);
+            if (filters.end_date) queryParams.append('end_date', filters.end_date);
+            if (filters.employee_id) queryParams.append('employee_id', filters.employee_id);
+            if (filters.full_name) queryParams.append('full_name', filters.full_name);
+
+            const response = await axiosInstance.get(
+                `/access/admin/check-records?${queryParams.toString()}`
+            );
+
+            return response.data.hasRecords;
+        } catch (error) {
+            console.error('Error checking records:', error);
+            throw error;
+        }
+    },
+
     recordAccess: async (type) => {
-        const response = await axios.post(`${API_URL}/access/record`, {
+        const response = await axiosInstance.post('/access/record', {
             access_type: type,
             device_id: "MAIN_DOOR"
-        }, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         return response.data;
     },
 
     getHistory: async () => {
-        const response = await axios.get(`${API_URL}/access/admin/logs`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        const response = await axiosInstance.get('/access/admin/logs');
         return response.data;
     },
 
@@ -31,8 +68,8 @@ export const accessService = {
                 }
             });
 
-            const response = await axios.get(
-                `${API_URL}/access/history/filtered?${queryParams.toString()}`
+            const response = await axiosInstance.get(
+                `/access/history/filtered?${queryParams.toString()}`
             );
             return response.data;
         } catch (error) {
@@ -40,18 +77,18 @@ export const accessService = {
         }
     },
 
+
     exportPdf: async (filters = {}) => {
         try {
             const queryParams = new URLSearchParams();
 
-            // Solo añadir los parámetros que tengan valores válidos
             if (filters.start_date) queryParams.append('start_date', filters.start_date);
             if (filters.end_date) queryParams.append('end_date', filters.end_date);
             if (filters.employee_id) queryParams.append('employee_id', filters.employee_id);
             if (filters.full_name) queryParams.append('full_name', filters.full_name);
 
-            const response = await axios.get(
-                `${API_URL}/access/admin/export-pdf?${queryParams.toString()}`,
+            const response = await axiosInstance.get(
+                `/access/admin/export-pdf?${queryParams.toString()}`,
                 {
                     responseType: 'blob'
                 }
@@ -80,8 +117,8 @@ export const accessService = {
             if (filters.employee_id) queryParams.append('employee_id', filters.employee_id);
             if (filters.full_name) queryParams.append('full_name', filters.full_name);
 
-            const response = await axios.get(
-                `${API_URL}/access/admin/export-pdf?${queryParams.toString()}`,
+            const response = await axiosInstance.get(
+                `/access/admin/export-pdf?${queryParams.toString()}`,
                 {
                     responseType: 'blob'
                 }

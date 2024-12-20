@@ -1,536 +1,7 @@
-// import {useEffect, useState} from 'react';
-// import {
-//     Card,
-//     Grid,
-//     TextField,
-//     Button,
-//     Dialog,
-//     DialogContent,
-//     DialogActions,
-//     IconButton,
-//     Box,
-//     CircularProgress,
-//     Typography,
-//     Alert,
-//     InputAdornment, Tooltip
-// } from '@mui/material';
-// import { CalendarMonth, Close } from '@mui/icons-material';
-// import { accessService } from '../../services/accessService';
-// import { normalizeString } from '../../utils';
-// import {ClearIcon} from "@mui/x-date-pickers";
-//
-// export const Reports = () => {
-//     const [filters, setFilters] = useState({
-//         start: '',
-//         end: '',
-//         employeeId: '',
-//         fullName: ''
-//     });
-//     const [previewOpen, setPreviewOpen] = useState(false);
-//     const [pdfUrl, setPdfUrl] = useState(null);
-//     const [loading, setLoading] = useState(false);
-//     const [error, setError] = useState(null);
-//
-//     const [searchTerm, setSearchTerm] = useState('');
-//
-//     const handleClearSearch = () => {
-//         setSearchTerm('');
-//         setFilters(prev => ({
-//             ...prev,
-//             employeeId: '',
-//             fullName: ''
-//         }));
-//     };
-//
-//     // const handleFilterChange = (field) => (event) => {
-//     //     setFilters({
-//     //         ...filters,
-//     //         [field]: event.target.value
-//     //     });
-//     // };
-//     useEffect(() => {
-//         if (searchTerm) {
-//             const searchNormalized = normalizeString(searchTerm);
-//             // Si parece ser un ID de empleado
-//             if (/^\d+$/.test(searchTerm)) {
-//                 setFilters(prev => ({
-//                     ...prev,
-//                     employeeId: searchTerm,
-//                     fullName: ''
-//                 }));
-//             } else { // Si parece ser un nombre
-//                 setFilters(prev => ({
-//                     ...prev,
-//                     employeeId: '',
-//                     fullName: searchTerm
-//                 }));
-//             }
-//         }
-//     }, [searchTerm]);
-//
-//     const handleDateClick = (inputId) => () => {
-//         document.getElementById(inputId)?.showPicker();
-//     };
-//
-//     const handlePreview = async () => {
-//         setLoading(true);
-//         setError(null);
-//         try {
-//             const blob = await accessService.getReportPreview({
-//                 start_date: filters.start,
-//                 end_date: filters.end,
-//                 employee_id: filters.employeeId,
-//                 full_name: filters.fullName
-//             });
-//             const url = URL.createObjectURL(blob);
-//             setPdfUrl(url);
-//             setPreviewOpen(true);
-//         } catch (error) {
-//             console.error('Error previewing PDF:', error);
-//             setError('Error al cargar la previsualización del PDF. Por favor, intente nuevamente.');
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-//
-//     const handleExport = async () => {
-//         setLoading(true);
-//         setError(null);
-//         try {
-//             await accessService.exportPdf({
-//                 start_date: filters.start,
-//                 end_date: filters.end,
-//                 employee_id: filters.employeeId,
-//                 full_name: filters.fullName
-//             });
-//         } catch (error) {
-//             console.error('Error exporting:', error);
-//             setError('Error al exportar el PDF. Por favor, intente nuevamente.');
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-//
-//     const handleClose = () => {
-//         setPreviewOpen(false);
-//         if (pdfUrl) {
-//             URL.revokeObjectURL(pdfUrl);
-//             setPdfUrl(null);
-//         }
-//     };
-//
-//     // return (
-//     //     <Grid container spacing={3}>
-//     //         <Grid item xs={12}>
-//     //             <Card sx={{ p: 3 }}>
-//     //                 <Grid container spacing={2} alignItems="center">
-//     //                     <Grid item xs={12} md={3}>
-//     //                         <TextField
-//     //                             id="start-date"
-//     //                             fullWidth
-//     //                             type="date"
-//     //                             label="Fecha Inicio"
-//     //                             InputLabelProps={{ shrink: true }}
-//     //                             value={filters.start}
-//     //                             onChange={handleFilterChange('start')}
-//     //                             InputProps={{
-//     //                                 endAdornment: (
-//     //                                     <InputAdornment
-//     //                                         position="end"
-//     //                                         sx={{ cursor: 'pointer' }}
-//     //                                         onClick={handleDateClick('start-date')}
-//     //                                     >
-//     //                                         <CalendarMonth />
-//     //                                     </InputAdornment>
-//     //                                 ),
-//     //                                 sx: {
-//     //                                     '& input::-webkit-calendar-picker-indicator': {
-//     //                                         display: 'none'
-//     //                                     }
-//     //                                 }
-//     //                             }}
-//     //                         />
-//     //                     </Grid>
-//     //                     <Grid item xs={12} md={3}>
-//     //                         <TextField
-//     //                             id="end-date"
-//     //                             fullWidth
-//     //                             type="date"
-//     //                             label="Fecha Fin"
-//     //                             InputLabelProps={{ shrink: true }}
-//     //                             value={filters.end}
-//     //                             onChange={handleFilterChange('end')}
-//     //                             InputProps={{
-//     //                                 endAdornment: (
-//     //                                     <InputAdornment
-//     //                                         position="end"
-//     //                                         sx={{ cursor: 'pointer' }}
-//     //                                         onClick={handleDateClick('end-date')}
-//     //                                     >
-//     //                                         <CalendarMonth />
-//     //                                     </InputAdornment>
-//     //                                 ),
-//     //                                 sx: {
-//     //                                     '& input::-webkit-calendar-picker-indicator': {
-//     //                                         display: 'none'
-//     //                                     }
-//     //                                 }
-//     //                             }}
-//     //                         />
-//     //                     </Grid>
-//     //                     <Grid item xs={12} md={3}>
-//     //                         <TextField
-//     //                             fullWidth
-//     //                             type="text"
-//     //                             label="ID de Empleado"
-//     //                             value={filters.employeeId}
-//     //                             onChange={handleFilterChange('employeeId')}
-//     //                         />
-//     //                     </Grid>
-//     //                     <Grid item xs={12} md={3}>
-//     //                         <TextField
-//     //                             fullWidth
-//     //                             label="Nombre Completo"
-//     //                             value={filters.fullName}
-//     //                             onChange={handleFilterChange('fullName')}
-//     //                         />
-//     //                     </Grid>
-//     //                     {error && (
-//     //                         <Grid item xs={12}>
-//     //                             <Alert severity="error">{error}</Alert>
-//     //                         </Grid>
-//     //                     )}
-//     //                     <Grid item xs={12} container spacing={2}>
-//     //                         <Grid item xs={12} md={6}>
-//     //                             <Button
-//     //                                 fullWidth
-//     //                                 variant="outlined"
-//     //                                 onClick={handlePreview}
-//     //                                 disabled={loading}
-//     //                                 sx={{ height: '56px' }}
-//     //                             >
-//     //                                 {loading ? (
-//     //                                     <CircularProgress size={24} />
-//     //                                 ) : (
-//     //                                     'Previsualizar PDF'
-//     //                                 )}
-//     //                             </Button>
-//     //                         </Grid>
-//     //                         <Grid item xs={12} md={6}>
-//     //                             <Button
-//     //                                 fullWidth
-//     //                                 variant="contained"
-//     //                                 onClick={handleExport}
-//     //                                 disabled={loading}
-//     //                                 sx={{ height: '56px' }}
-//     //                             >
-//     //                                 {loading ? (
-//     //                                     <CircularProgress size={24} />
-//     //                                 ) : (
-//     //                                     'Exportar PDF'
-//     //                                 )}
-//     //                             </Button>
-//     //                         </Grid>
-//     //                     </Grid>
-//     //                 </Grid>
-//     //             </Card>
-//     //         </Grid>
-//     //
-//     //         <Dialog
-//     //             open={previewOpen}
-//     //             onClose={handleClose}
-//     //             maxWidth="lg"
-//     //             fullWidth
-//     //         >
-//     //             <DialogContent sx={{ position: 'relative', minHeight: '80vh' }}>
-//     //                 <IconButton
-//     //                     onClick={handleClose}
-//     //                     sx={{ position: 'absolute', right: 8, top: 8, zIndex: 1 }}
-//     //                 >
-//     //                     <Close />
-//     //                 </IconButton>
-//     //                 {pdfUrl && (
-//     //                     <Box
-//     //                         sx={{
-//     //                             width: '100%',
-//     //                             height: '100%',
-//     //                             display: 'flex',
-//     //                             justifyContent: 'center',
-//     //                             alignItems: 'center'
-//     //                         }}
-//     //                     >
-//     //                         <iframe
-//     //                             src={`${pdfUrl}#toolbar=0`}
-//     //                             style={{
-//     //                                 width: '100%',
-//     //                                 height: '75vh',
-//     //                                 border: 'none'
-//     //                             }}
-//     //                             title="PDF Preview"
-//     //                         />
-//     //                     </Box>
-//     //                 )}
-//     //                 {!pdfUrl && !loading && (
-//     //                     <Typography variant="body1" textAlign="center">
-//     //                         No hay PDF para previsualizar
-//     //                     </Typography>
-//     //                 )}
-//     //                 {loading && (
-//     //                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '75vh' }}>
-//     //                         <CircularProgress />
-//     //                     </Box>
-//     //                 )}
-//     //             </DialogContent>
-//     //             <DialogActions>
-//     //                 <Button onClick={handleClose}>Cerrar</Button>
-//     //                 <Button
-//     //                     onClick={handleExport}
-//     //                     variant="contained"
-//     //                     disabled={loading}
-//     //                 >
-//     //                     {loading ? <CircularProgress size={24} /> : 'Exportar'}
-//     //                 </Button>
-//     //             </DialogActions>
-//     //         </Dialog>
-//     //     </Grid>
-//     // );
-//
-//     return (
-//         <Grid container spacing={3}>
-//             <Grid item xs={12}>
-//                 <Card>
-//                     {/* Header Section */}
-//                     <Box sx={{
-//                         p: 2,
-//                         display: 'flex',
-//                         justifyContent: 'space-between',
-//                         alignItems: 'center',
-//                         flexDirection: { xs: 'column', sm: 'row' },
-//                         gap: 2,
-//                         borderBottom: `1px solid ${theme.palette.divider}`
-//                     }}>
-//                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-//                             <Typography variant="h6" color="primary">
-//                                 Reportes de Acceso
-//                             </Typography>
-//                         </Box>
-//                     </Box>
-//
-//                     {/* Search and Filter Section */}
-//                     <Box sx={{ px: 2, py: 2, display: 'flex', gap: 2 }}>
-//                         {/* Campo Fecha Inicio */}
-//                         <TextField
-//                             id="start-date"
-//                             type="date"
-//                             label="Fecha Inicio"
-//                             size="medium"
-//                             InputLabelProps={{shrink: true}}
-//                             value={filters.start}
-//                             onChange={handleFilterChange('start')}
-//                             sx={{ width: '250px' }}
-//                             InputProps={{
-//                                 endAdornment: (
-//                                     <InputAdornment position="end">
-//                                         {filters.start && (
-//                                             <Tooltip title="Limpiar fecha">
-//                                                 <IconButton
-//                                                     size="small"
-//                                                     onClick={() => handleFilterChange('start')({ target: { value: '' }})}
-//                                                 >
-//                                                     <ClearIcon fontSize="small" />
-//                                                 </IconButton>
-//                                             </Tooltip>
-//                                         )}
-//                                         <Tooltip title="Seleccionar fecha">
-//                                             <IconButton
-//                                                 size="small"
-//                                                 onClick={handleDateClick('start-date')}
-//                                             >
-//                                                 <CalendarMonth color="action"/>
-//                                             </IconButton>
-//                                         </Tooltip>
-//                                     </InputAdornment>
-//                                 ),
-//                                 sx: {
-//                                     '& input::-webkit-calendar-picker-indicator': {
-//                                         display: 'none'
-//                                     }
-//                                 }
-//                             }}
-//                         />
-//
-//                         {/* Campo Fecha Fin */}
-//                         <TextField
-//                             id="end-date"
-//                             type="date"
-//                             label="Fecha Fin"
-//                             size="medium"
-//                             InputLabelProps={{shrink: true}}
-//                             value={filters.end}
-//                             onChange={handleFilterChange('end')}
-//                             sx={{ width: '250px' }}
-//                             InputProps={{
-//                                 endAdornment: (
-//                                     <InputAdornment position="end">
-//                                         {filters.end && (
-//                                             <Tooltip title="Limpiar fecha">
-//                                                 <IconButton
-//                                                     size="small"
-//                                                     onClick={() => handleFilterChange('end')({ target: { value: '' }})}
-//                                                 >
-//                                                     <ClearIcon fontSize="small" />
-//                                                 </IconButton>
-//                                             </Tooltip>
-//                                         )}
-//                                         <Tooltip title="Seleccionar fecha">
-//                                             <IconButton
-//                                                 size="small"
-//                                                 onClick={handleDateClick('end-date')}
-//                                             >
-//                                                 <CalendarMonth color="action"/>
-//                                             </IconButton>
-//                                         </Tooltip>
-//                                     </InputAdornment>
-//                                 ),
-//                                 sx: {
-//                                     '& input::-webkit-calendar-picker-indicator': {
-//                                         display: 'none'
-//                                     }
-//                                 }
-//                             }}
-//                         />
-//
-//                         {/* Barra de búsqueda */}
-//                         <TextField
-//                             fullWidth
-//                             size="medium"
-//                             variant="outlined"
-//                             placeholder="Buscar por nombre o ID de empleado..."
-//                             value={searchTerm}
-//                             onChange={(e) => setSearchTerm(e.target.value)}
-//                             sx={{ flex: '1 1 auto', maxWidth: '400px' }}
-//                             InputProps={{
-//                                 startAdornment: (
-//                                     <InputAdornment position="start">
-//                                         <SearchIcon color="action" />
-//                                     </InputAdornment>
-//                                 ),
-//                                 endAdornment: searchTerm && (
-//                                     <InputAdornment position="end">
-//                                         <Tooltip title="Limpiar búsqueda">
-//                                             <IconButton
-//                                                 onClick={handleClearSearch}
-//                                                 edge="end"
-//                                                 size="small"
-//                                             >
-//                                                 <ClearIcon fontSize="small" />
-//                                             </IconButton>
-//                                         </Tooltip>
-//                                     </InputAdornment>
-//                                 )
-//                             }}
-//                         />
-//
-//                         {/* Botones de acción */}
-//                         <Tooltip title="Previsualizar reporte">
-//                             <Button
-//                                 variant="outlined"
-//                                 onClick={handlePreview}
-//                                 disabled={loading}
-//                                 sx={{ minWidth: '170px' }}
-//                                 startIcon={loading ? <CircularProgress size={20} /> : null}
-//                             >
-//                                 Previsualizar PDF
-//                             </Button>
-//                         </Tooltip>
-//
-//                         <Tooltip title="Exportar reporte">
-//                             <Button
-//                                 variant="contained"
-//                                 onClick={handleExport}
-//                                 disabled={loading}
-//                                 sx={{ minWidth: '140px' }}
-//                                 startIcon={loading ? <CircularProgress size={20} /> : null}
-//                             >
-//                                 Exportar PDF
-//                             </Button>
-//                         </Tooltip>
-//                     </Box>
-//
-//                     {/* Error Message */}
-//                     {error && (
-//                         <Box sx={{ px: 2, pb: 2 }}>
-//                             <Alert severity="error" onClose={() => setError(null)}>
-//                                 {error}
-//                             </Alert>
-//                         </Box>
-//                     )}
-//                 </Card>
-//             </Grid>
-//
-//             {/* Preview Dialog */}
-//             <Dialog
-//                 open={previewOpen}
-//                 onClose={handleClose}
-//                 maxWidth="lg"
-//                 fullWidth
-//             >
-//                 <DialogContent sx={{ position: 'relative', minHeight: '80vh' }}>
-//                     <IconButton
-//                         onClick={handleClose}
-//                         sx={{ position: 'absolute', right: 8, top: 8, zIndex: 1 }}
-//                     >
-//                         <Close />
-//                     </IconButton>
-//                     {pdfUrl && (
-//                         <Box sx={{
-//                             width: '100%',
-//                             height: '100%',
-//                             display: 'flex',
-//                             justifyContent: 'center',
-//                             alignItems: 'center'
-//                         }}>
-//                             <iframe
-//                                 src={`${pdfUrl}#toolbar=0`}
-//                                 style={{
-//                                     width: '100%',
-//                                     height: '75vh',
-//                                     border: 'none'
-//                                 }}
-//                                 title="PDF Preview"
-//                             />
-//                         </Box>
-//                     )}
-//                     {!pdfUrl && !loading && (
-//                         <Typography variant="body1" textAlign="center">
-//                             No hay PDF para previsualizar
-//                         </Typography>
-//                     )}
-//                     {loading && (
-//                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '75vh' }}>
-//                             <CircularProgress />
-//                         </Box>
-//                     )}
-//                 </DialogContent>
-//                 <DialogActions>
-//                     <Button onClick={handleClose}>Cerrar</Button>
-//                     <Button
-//                         onClick={handleExport}
-//                         variant="contained"
-//                         disabled={loading}
-//                     >
-//                         {loading ? <CircularProgress size={24} /> : 'Exportar'}
-//                     </Button>
-//                 </DialogActions>
-//             </Dialog>
-//         </Grid>
-//     );
-//
-// };
-
-import {useEffect, useState} from 'react';
+import { useState, useEffect } from 'react';
 import {
-    Card,
+    Container,
+    Paper,
     Grid,
     TextField,
     Button,
@@ -539,38 +10,53 @@ import {
     DialogActions,
     IconButton,
     Box,
-    CircularProgress,
     Typography,
     Alert,
     InputAdornment,
-    Tooltip,
-    useTheme
+    useTheme,
+    useMediaQuery,
+    Stack,
+    Chip,
+    Autocomplete,
+    LinearProgress,
+    DialogTitle, Snackbar
 } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import {
-    CalendarMonth,
     Close,
     Clear as ClearIcon,
-    Search as SearchIcon
+    Search as SearchIcon,
+    PictureAsPdf,
+    RemoveRedEye, ClearAll,
+    Description, CalendarMonth
 } from '@mui/icons-material';
 import { accessService } from '../../services/accessService';
 import { userService } from '../../services/userService';
-import { normalizeString } from '../../utils';
 
 export const Reports = () => {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    // Estados
     const [filters, setFilters] = useState({
         start: '',
         end: '',
         employeeId: '',
         fullName: ''
     });
+
     const [previewOpen, setPreviewOpen] = useState(false);
     const [pdfUrl, setPdfUrl] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
     const [allUsers, setAllUsers] = useState([]);
-
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [activeFilters, setActiveFilters] = useState([]);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
 
     // Cargar usuarios al montar el componente
     useEffect(() => {
@@ -578,95 +64,155 @@ export const Reports = () => {
             try {
                 const users = await userService.getUsers();
                 setAllUsers(users);
-            } catch (error) {
-                console.error('Error loading users:', error);
+            } catch (err) {
                 setError('Error al cargar la lista de usuarios');
             }
         };
         loadUsers();
     }, []);
 
-    const handleFilterChange = (field) => (event) => {
-        setFilters({
-            ...filters,
-            [field]: event.target.value
-        });
-    };
-
-    const handleClearSearch = () => {
-        setSearchTerm('');
+    // Manejadores de eventos
+    const handleDateChange = (field) => (event) => {
+        const value = event.target.value;
         setFilters(prev => ({
             ...prev,
-            employeeId: '',
-            fullName: ''
+            [field]: value
         }));
+
+        if (value) {
+            setActiveFilters(prev => [
+                ...prev.filter(f => f.key !== field),
+                { key: field, label: `${field === 'start' ? 'Inicio' : 'Fin'}: ${value}` }
+            ]);
+        } else {
+            setActiveFilters(prev => prev.filter(f => f.key !== field));
+        }
     };
 
-    // Efecto para manejar la búsqueda
-    useEffect(() => {
-        if (!searchTerm) {
+    const handleUserChange = (_, newValue) => {
+        setSelectedUser(newValue);
+        setFilters(prev => ({
+            ...prev,
+            employeeId: newValue?.employee_id || '',
+            fullName: newValue?.full_name || ''
+        }));
+
+        if (newValue) {
+            setActiveFilters(prev => [
+                ...prev.filter(f => f.key !== 'user'),
+                { key: 'user', label: `Usuario: ${newValue.full_name}` }
+            ]);
+        } else {
+            setActiveFilters(prev => prev.filter(f => f.key !== 'user'));
+        }
+    };
+
+    const handleRemoveFilter = (key) => {
+        if (key === 'user') {
+            setSelectedUser(null);
             setFilters(prev => ({
                 ...prev,
                 employeeId: '',
                 fullName: ''
             }));
-            return;
-        }
-
-        const searchNormalized = normalizeString(searchTerm);
-        const filtered = allUsers.filter(user =>
-            normalizeString(user.full_name || '').includes(searchNormalized) ||
-            user.employee_id?.toString().includes(searchTerm)
-        );
-
-        if (filtered.length > 0) {
-            const firstMatch = filtered[0];
+        } else {
             setFilters(prev => ({
                 ...prev,
-                employeeId: firstMatch.employee_id?.toString() || '',
-                fullName: firstMatch.full_name || ''
+                [key]: ''
             }));
         }
-    }, [searchTerm, allUsers]);
-
-    const handleDateClick = (inputId) => () => {
-        document.getElementById(inputId)?.showPicker();
+        setActiveFilters(prev => prev.filter(f => f.key !== key));
     };
 
     const handlePreview = async () => {
         setLoading(true);
         setError(null);
         try {
+            // Primero verificamos si hay registros
+            const hasRecords = await accessService.checkRecords({
+                start_date: filters.start,
+                end_date: filters.end,
+                employee_id: filters.employeeId,
+                full_name: filters.fullName
+            });
+
+            if (!hasRecords) {
+                setSnackbar({
+                    open: true,
+                    message: selectedUser
+                        ? `${selectedUser.full_name} no tiene registros de acceso${filters.start ? ' en el rango de fechas seleccionado' : ''}`
+                        : 'No hay registros para las fechas seleccionadas',
+                    severity: 'warning'
+                });
+                return;
+            }
+
+            // Solo si hay registros, procedemos a obtener el PDF
             const blob = await accessService.getReportPreview({
                 start_date: filters.start,
                 end_date: filters.end,
                 employee_id: filters.employeeId,
                 full_name: filters.fullName
             });
+
             const url = URL.createObjectURL(blob);
             setPdfUrl(url);
             setPreviewOpen(true);
-        } catch (error) {
-            console.error('Error previewing PDF:', error);
-            setError('Error al cargar la previsualización del PDF. Por favor, intente nuevamente.');
+        } catch (err) {
+            setError('Error al cargar la previsualización del PDF');
         } finally {
             setLoading(false);
         }
+    };
+
+    // Función para cerrar el Snackbar
+    const handleCloseSnackbar = () => {
+        setSnackbar(prev => ({
+            ...prev,
+            open: false
+        }));
+    };
+
+    // Función auxiliar para verificar si se puede realizar la acción
+    const canPerformAction = () => {
+        // Si hay usuario seleccionado, permitir la acción sin importar las fechas
+        if (selectedUser) return true;
+        // Si no hay usuario, requerir ambas fechas
+        return filters.start && filters.end;
     };
 
     const handleExport = async () => {
         setLoading(true);
         setError(null);
         try {
+            // Primero verificamos si hay registros
+            const hasRecords = await accessService.checkRecords({
+                start_date: filters.start,
+                end_date: filters.end,
+                employee_id: filters.employeeId,
+                full_name: filters.fullName
+            });
+
+            if (!hasRecords) {
+                setSnackbar({
+                    open: true,
+                    message: selectedUser
+                        ? `${selectedUser.full_name} no tiene registros de acceso${filters.start ? ' en el rango de fechas seleccionado' : ''}`
+                        : 'No hay registros para las fechas seleccionadas',
+                    severity: 'warning'
+                });
+                return;
+            }
+
+            // Solo si hay registros, procedemos con la exportación
             await accessService.exportPdf({
                 start_date: filters.start,
                 end_date: filters.end,
                 employee_id: filters.employeeId,
                 full_name: filters.fullName
             });
-        } catch (error) {
-            console.error('Error exporting:', error);
-            setError('Error al exportar el PDF. Por favor, intente nuevamente.');
+        } catch (err) {
+            setError('Error al exportar el PDF');
         } finally {
             setLoading(false);
         }
@@ -680,212 +226,335 @@ export const Reports = () => {
         }
     };
 
-    const renderDateInput = (id, label, value, onChange) => (
-        <TextField
-            id={id}
-            type="date"
-            label={label}
-            size="medium"
-            value={value}
-            onChange={onChange}
-            sx={{width: '250px'}}
-            inputProps={{
-                'aria-label': label
-            }}
-            InputLabelProps={{
-                shrink: true
-            }}
-            InputProps={{
-                endAdornment: (
-                    <InputAdornment position="end">
-                        {value && (
-                            <Tooltip title="Limpiar fecha">
-                                <IconButton
-                                    size="small"
-                                    onClick={() => onChange({target: {value: ''}})}
-                                >
-                                    <ClearIcon fontSize="small"/>
-                                </IconButton>
-                            </Tooltip>
-                        )}
-                        <Tooltip title="Seleccionar fecha">
-                            <IconButton
-                                size="small"
-                                onClick={handleDateClick(id)}
-                            >
-                                <CalendarMonth color="action"/>
-                            </IconButton>
-                        </Tooltip>
-                    </InputAdornment>
-                )
-            }}
-        />
-    );
+    const handleClearAll = () => {
+        setFilters({
+            start: '',
+            end: '',
+            employeeId: '',
+            fullName: ''
+        });
+        setSelectedUser(null);
+        setActiveFilters([]);
+    };
 
     return (
-        <Grid container spacing={3}>
-            <Grid item xs={12}>
-                <Card>
-                    <Box sx={{
-                        p: 2,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexDirection: {xs: 'column', sm: 'row'},
-                        gap: 2,
-                        borderBottom: `1px solid ${theme.palette.divider}`
-                    }}>
-                        <Typography variant="h6" color="primary">
-                            Reportes de Acceso
-                        </Typography>
-                    </Box>
+        // <Container maxWidth="lg" sx={{ py: 3 }}>
+        <Container
+            maxWidth="lg"
+            sx={{
+                py: 3,
+                minHeight: 'calc(100vh - 64px)', // 64px es el alto típico del AppBar
+                backgroundColor: 'background.default', // Asegura que use el color de fondo del tema
+                display: 'flex',
+                flexDirection: 'column'
+            }}
+        >
+            {loading && (
+                <LinearProgress
+                    sx={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: theme.zIndex.drawer + 1
+                    }}
+                />
+            )}
 
-                    <Box sx={{px: 2, py: 2, display: 'flex', flexDirection: 'column', gap: 2}}>
-                        {/* Contenedor para fechas y búsqueda */}
-                        <Box sx={{display: 'flex', gap: 2, flexWrap: 'wrap'}}>
-                            {renderDateInput(
-                                "start-date",
-                                "Fecha Inicio",
-                                filters.start,
-                                handleFilterChange('start')
-                            )}
+            {/*<Paper elevation={0} sx={{ p: 3 }}>*/}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    flex: 1, // Esto hará que el Paper tome todo el espacio vertical disponible
+                    backgroundColor: 'background.paper'
+                }}
+            >
+                <Stack spacing={3}>
+                    {/* Título */}
+                    <Typography variant="h5" color="primary">
+                        Reportes de Acceso
+                    </Typography>
 
-                            {renderDateInput(
-                                "end-date",
-                                "Fecha Fin",
-                                filters.end,
-                                handleFilterChange('end')
-                            )}
+                    {/* Mensajes de error */}
+                    {error && (
+                        <Alert
+                            severity="error"
+                            onClose={() => setError(null)}
+                            action={
+                                <Button color="inherit" size="small">
+                                    REINTENTAR
+                                </Button>
+                            }
+                        >
+                            {error}
+                        </Alert>
+                    )}
 
+                    {/* Filtros */}
+                    <Stack spacing={2}>
+                        <Stack
+                            direction={{ xs: 'column', md: 'row' }}
+                            spacing={2}
+                            alignItems="flex-start"
+                            sx={{
+                                '& > :nth-of-type(1), & > :nth-of-type(2)': { // Los dos campos de fecha
+                                    width: '380px !important' // Reducimos el ancho de los campos de fecha
+                                },
+                                '& > :nth-of-type(3)': { // El Autocomplete
+                                    flex: '1 1 auto', // Hará que tome el espacio restante
+                                    minWidth: '300px' // Aseguramos un ancho mínimo
+                                }
+                            }}
+                        >
+                            {/* TextField Fecha Inicio */}
                             <TextField
-                                size="medium"
-                                variant="outlined"
-                                placeholder="Buscar por nombre o ID de empleado..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                sx={{flex: '1 1 auto', maxWidth: '400px'}}
-                                inputProps={{
-                                    'aria-label': 'Búsqueda'
-                                }}
+                                id="date-start"
+                                type="date"
+                                label="Fecha Inicio"
+                                value={filters.start}
+                                onChange={handleDateChange('start')}
+                                InputLabelProps={{ shrink: true }}
                                 InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon color="action"/>
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: searchTerm && (
+                                    endAdornment: ( // Movemos el ícono al final
                                         <InputAdornment position="end">
-                                            <Tooltip title="Limpiar búsqueda">
+                                            {filters.start && (
                                                 <IconButton
-                                                    onClick={handleClearSearch}
-                                                    edge="end"
                                                     size="small"
+                                                    onClick={() => handleDateChange('start')({ target: { value: '' } })}
                                                 >
-                                                    <ClearIcon fontSize="small"/>
+                                                    <ClearIcon />
                                                 </IconButton>
-                                            </Tooltip>
+                                            )}
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    document.getElementById('date-start').showPicker();
+                                                }}
+                                            >
+                                                <CalendarMonth color="action" />
+                                            </IconButton>
                                         </InputAdornment>
                                     )
                                 }}
                             />
-                        </Box>
 
-                        {/* Contenedor para botones */}
-                        <Box sx={{display: 'flex', gap: 2, justifyContent: 'flex-end'}}>
-                            <Tooltip title="Previsualizar reporte">
-                            <span>
-                                <Button
-                                    variant="outlined"
-                                    onClick={handlePreview}
-                                    disabled={loading}
-                                    sx={{minWidth: '170px'}}
-                                    startIcon={loading ? <CircularProgress size={20}/> : null}
-                                >
-                                    Previsualizar PDF
-                                </Button>
-                            </span>
-                            </Tooltip>
+                            {/* TextField Fecha Fin */}
+                            <TextField
+                                id="date-end"
+                                type="date"
+                                label="Fecha Fin"
+                                value={filters.end}
+                                onChange={handleDateChange('end')}
+                                InputLabelProps={{ shrink: true }}
+                                InputProps={{
+                                    endAdornment: ( // Movemos el ícono al final
+                                        <InputAdornment position="end">
+                                            {filters.end && (
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDateChange('end')({ target: { value: '' } })}
+                                                >
+                                                    <ClearIcon />
+                                                </IconButton>
+                                            )}
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    document.getElementById('date-end').showPicker();
+                                                }}
+                                            >
+                                                <CalendarMonth color="action" />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
 
-                            <Tooltip title="Exportar reporte">
-                            <span>
-                                <Button
-                                    variant="contained"
-                                    onClick={handleExport}
-                                    disabled={loading}
-                                    sx={{minWidth: '140px'}}
-                                    startIcon={loading ? <CircularProgress size={20}/> : null}
-                                >
-                                    Exportar PDF
-                                </Button>
-                            </span>
-                            </Tooltip>
-                        </Box>
-                    </Box>
+                            {/* Autocomplete búsqueda de usuario (ahora más amplio) */}
+                            <Autocomplete
+                                fullWidth
+                                options={allUsers}
+                                value={selectedUser}
+                                onChange={handleUserChange}
+                                getOptionLabel={(option) =>
+                                    `${option.full_name} (${option.employee_id})`
+                                }
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Buscar usuario"
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <SearchIcon />
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                )}
+                            />
 
-                    {error && (
-                        <Box sx={{px: 2, pb: 2}}>
-                            <Alert severity="error" onClose={() => setError(null)}>
-                                {error}
-                            </Alert>
-                        </Box>
-                    )}
-                </Card>
-            </Grid>
+                        </Stack>
 
+                        {/* Chips de filtros activos */}
+                        {activeFilters.length > 0 && (
+                            <Stack direction="row" spacing={1} flexWrap="wrap">
+                                {activeFilters.map((filter) => (
+                                    <Chip
+                                        key={filter.key}
+                                        label={filter.label}
+                                        onDelete={() => handleRemoveFilter(filter.key)}
+                                        size="small"
+                                    />
+                                ))}
+                            </Stack>
+                        )}
+                    </Stack>
+
+                    {/* Botones de acción */}
+                    <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={2}
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
+                        <LoadingButton
+                            startIcon={<ClearAll />}
+                            variant="text"
+                            onClick={handleClearAll}
+                            disabled={!activeFilters.length}
+                            color="inherit"
+                        >
+                            Limpiar filtros
+                        </LoadingButton>
+
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                            <LoadingButton
+                                loading={loading}
+                                loadingPosition="start"
+                                startIcon={<RemoveRedEye />}
+                                variant="outlined"
+                                onClick={handlePreview}
+                                disabled={!canPerformAction()}
+                            >
+                                Previsualizar PDF
+                            </LoadingButton>
+
+                            <LoadingButton
+                                loading={loading}
+                                loadingPosition="start"
+                                startIcon={<PictureAsPdf />}
+                                variant="contained"
+                                onClick={handleExport}
+                                disabled={!canPerformAction()}
+                            >
+                                Exportar PDF
+                            </LoadingButton>
+
+                        </Stack>
+                    </Stack>
+                </Stack>
+            </Paper>
+
+            {/* Diálogo de previsualización */}
             <Dialog
                 open={previewOpen}
                 onClose={handleClose}
+                fullScreen={isMobile}
                 maxWidth="lg"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        m: isMobile ? 0 : 1,
+                        maxHeight: '90vh',
+                        borderRadius: isMobile ? 0 : 2
+                    }
+                }}
             >
-                <DialogContent sx={{position: 'relative', minHeight: '80vh'}}>
-                    <IconButton
-                        onClick={handleClose}
-                        sx={{position: 'absolute', right: 8, top: 8, zIndex: 1}}
+                <DialogTitle>
+                    <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
                     >
-                        <Close/>
-                    </IconButton>
-                    {pdfUrl && (
-                        <Box sx={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }}>
-                            <iframe
-                                src={`${pdfUrl}#toolbar=0`}
-                                style={{
-                                    width: '100%',
-                                    height: '75vh',
-                                    border: 'none'
-                                }}
-                                title="PDF Preview"
-                            />
-                        </Box>
-                    )}
-                    {!pdfUrl && !loading && (
-                        <Typography variant="body1" textAlign="center">
-                            No hay PDF para previsualizar
+                        <Typography variant="h6">
+                            Previsualización de Reporte
                         </Typography>
-                    )}
-                    {loading && (
-                        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '75vh'}}>
-                            <CircularProgress/>
-                        </Box>
+                        <IconButton
+                            edge="end"
+                            aria-label="cerrar"
+                            onClick={handleClose}
+                        >
+                            <Close />
+                        </IconButton>
+                    </Stack>
+                </DialogTitle>
+
+                <DialogContent>
+                    {pdfUrl ? (
+                        <Box
+                            component="iframe"
+                            src={`${pdfUrl}#toolbar=0`}
+                            sx={{
+                                width: '100%',
+                                height: '75vh',
+                                border: 'none'
+                            }}
+                            title="PDF Preview"
+                        />
+                    ) : (
+                        <Stack
+                            alignItems="center"
+                            justifyContent="center"
+                            spacing={2}
+                            sx={{ py: 8 }}
+                        >
+                            <Description
+                                sx={{ fontSize: 60, color: 'text.secondary' }}
+                            />
+                            <Typography color="text.secondary">
+                                No hay PDF para previsualizar
+                            </Typography>
+                        </Stack>
                     )}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cerrar</Button>
-                    <Button
-                        onClick={handleExport}
-                        variant="contained"
-                        disabled={loading}
-                    >
-                        {loading ? <CircularProgress size={24}/> : 'Exportar'}
+
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={handleClose}>
+                        Cerrar
                     </Button>
+                    <LoadingButton
+                        loading={loading}
+                        variant="contained"
+                        onClick={handleExport}
+                        disabled={canPerformAction()}
+                    >
+                        Exportar PDF
+                    </LoadingButton>
                 </DialogActions>
-            </Dialog>
-        </Grid>
+            </Dialog>        {/* Snackbar para mensajes */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity={snackbar.severity}
+                    variant="filled"
+                    sx={{ width: '100%', '&.MuiAlert-standardWarning': {
+                            backgroundColor: theme.palette.warning.light,
+                            color: theme.palette.warning.contrastText}}}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+        </Container>
     );
-}
+};
+
+
+
