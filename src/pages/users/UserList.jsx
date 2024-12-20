@@ -2335,7 +2335,7 @@
 //     );
 // };
 
-// // nueva columna mejora 2 prompt claude mejoras a refresh
+
 import {useState, useEffect, useCallback, useRef} from 'react';
 import {
     Table,
