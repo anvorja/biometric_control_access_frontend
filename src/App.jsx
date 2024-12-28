@@ -58,11 +58,12 @@ import { theme } from './config/theme';
 import { AccessControl } from "./pages/access/AccessControl.jsx";
 import { AccessHistory } from "./pages/access/AccessHistory.jsx";
 import { Reports } from "./pages/reports/Reports.jsx";
-import { AuthProvider } from "./context/AuthContext.jsx";
+// import { AuthProvider } from "./context/AuthContext.jsx";
 import { PrivateRoute } from "./components/PrivateRoute.jsx";
 import { SnackbarProvider } from "./components/common/Snackbar.jsx";
 import { UserEdit } from "./pages/users/UserEdit.jsx";
 import { UserFingerprint } from "./pages/users/UserFingerprint.jsx";
+import {AuthProvider} from "./context/index.js";
 
 function App() {
     return (

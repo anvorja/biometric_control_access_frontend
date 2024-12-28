@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Card, TextField, Button, Typography, FormControlLabel, Checkbox, FormHelperText } from '@mui/material';
 import { userService } from '../../services/userService';
 // import { useSnackbar } from '../../components/common/Snackbar';
-import { useSnackbar } from '../../utils/hooks';
+import { useSnackbar } from '../../utils/hooks/useSnackbarHooks.js';
 import { Loading } from '../../components/common/Loading';
 import { validateAndFormatInput } from "../../utils/index.js";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

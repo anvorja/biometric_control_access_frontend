@@ -10,12 +10,13 @@ import {
     InputAdornment,
 } from '@mui/material';
 import { Mail, Lock} from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+// import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
 // import { useSnackbar } from "../../components/common/Snackbar.jsx";
-import { useSnackbar } from '../../utils/hooks.js';
+import { useSnackbar } from '../../utils/hooks/useSnackbarHooks.js';
 import { Loading } from '../../components/common/Loading.jsx';
 import {Visibility, VisibilityOff} from "@mui/icons-material";
+import {useAuth} from "../../utils/hooks/useAuth.js";
 
 export const Login = () => {
     const [credentials, setCredentials] = useState({ email: '', password: '' });

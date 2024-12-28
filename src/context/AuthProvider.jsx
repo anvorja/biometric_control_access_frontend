@@ -1,10 +1,10 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+// src/context/AuthProvider.jsx
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { authService } from '../services/authService';
-// import { useSnackbar } from '../components/common/Snackbar';
-import { useSnackbar } from '../utils/hooks.js';
-
-const AuthContext = createContext(null);
+import { useSnackbar } from '../utils/hooks/useSnackbarHooks.js';
+import AuthContext from './AuthContext.js';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
     const [token, setToken] = useState(() => localStorage.getItem('token'));
     const navigate = useNavigate();
-    const { showSnackbar } = useSnackbar();  // Añadimos useSnackbar
+    const { showSnackbar } = useSnackbar();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -38,11 +38,13 @@ export const AuthProvider = ({ children }) => {
             await authService.logout();
             setToken(null);
             setUser(null);
-            showSnackbar('Salida exitosa', 'success');  // Añadimos mensaje de éxito
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            showSnackbar('Salida exitosa', 'success');
             navigate('/login', { replace: true });
         } catch (error) {
             console.error('Error in logout:', error);
-            showSnackbar('Error al cerrar sesión', 'error');  // Añadimos mensaje de error
+            showSnackbar('Error al cerrar sesión', 'error');
         }
     };
 
@@ -65,10 +67,6 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired
 };

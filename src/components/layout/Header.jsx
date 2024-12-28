@@ -1,6 +1,7 @@
 import { AppBar, Toolbar, Typography, IconButton, Box } from '@mui/material';
 import { LogoutOutlined } from '@mui/icons-material';
-import { useAuth } from '../../context/AuthContext';
+import {useAuth} from "../../utils/hooks/useAuth.js";
+// import { useAuth } from '../../context/AuthContext';
 
 export const Header = () => {
     const { user, logout } = useAuth();
