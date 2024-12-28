@@ -59,7 +59,7 @@ export const accessService = {
     },
 
     getFilteredHistory: async (filters = {}) => {
-        try {
+
             const queryParams = new URLSearchParams();
 
             Object.entries(filters).forEach(([key, value]) => {
@@ -72,9 +72,6 @@ export const accessService = {
                 `/access/history/filtered?${queryParams.toString()}`
             );
             return response.data;
-        } catch (error) {
-            throw error;
-        }
     },
 
 

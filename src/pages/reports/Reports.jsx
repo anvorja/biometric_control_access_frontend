@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
     Container,
     Paper,
-    Grid,
     TextField,
     Button,
     Dialog,
@@ -64,7 +63,7 @@ export const Reports = () => {
             try {
                 const users = await userService.getUsers();
                 setAllUsers(users);
-            } catch (err) {
+            } catch {
                 setError('Error al cargar la lista de usuarios');
             }
         };
@@ -158,7 +157,7 @@ export const Reports = () => {
             const url = URL.createObjectURL(blob);
             setPdfUrl(url);
             setPreviewOpen(true);
-        } catch (err) {
+        } catch {
             setError('Error al cargar la previsualización del PDF');
         } finally {
             setLoading(false);
@@ -211,7 +210,7 @@ export const Reports = () => {
                 employee_id: filters.employeeId,
                 full_name: filters.fullName
             });
-        } catch (err) {
+        } catch {
             setError('Error al exportar el PDF');
         } finally {
             setLoading(false);

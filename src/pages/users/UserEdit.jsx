@@ -291,7 +291,7 @@
 //     );
 // };
 
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useEffect} from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -304,8 +304,7 @@ import {
     Stack,
     InputAdornment,
     Switch,
-    FormControlLabel,
-    FormHelperText
+    FormControlLabel
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -314,8 +313,6 @@ import {
     Badge,
     ArrowBack,
     Save,
-    CheckCircle,
-    Cancel
 } from '@mui/icons-material';
 import { userService } from '../../services/userService';
 // import { useSnackbar } from '../../components/common/Snackbar';

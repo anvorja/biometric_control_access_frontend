@@ -119,7 +119,7 @@ export const UserFingerprint = () => {
             try {
                 const userData = await userService.getUser(id);
                 setUser(userData);
-            } catch (error) {
+            } catch{
                 showSnackbar('Error al cargar usuario', 'error');
             } finally {
                 setLoading(false);
