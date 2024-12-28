@@ -1,13 +1,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Card, TextField, Button, Typography } from '@mui/material';
+import {
+    Box,
+    Paper,
+    TextField,
+    Button,
+    Typography,
+    IconButton,
+    InputAdornment,
+} from '@mui/material';
+import { Mail, Lock} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { authService } from '../../services/authService';
-import {useSnackbar} from "../../components/common/Snackbar.jsx";
+// import { useSnackbar } from "../../components/common/Snackbar.jsx";
+import { useSnackbar } from '../../utils/hooks.js';
 import { Loading } from '../../components/common/Loading.jsx';
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 
 export const Login = () => {
     const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -25,30 +37,16 @@ export const Login = () => {
             }
 
             const data = await authService.login(credentials.email, credentials.password);
-            //console.log('Login response:', data);
 
-            // Store the access token in localStorage and context
             if (data.access_token) {
-
-                // Guardamos primero el token
                 localStorage.setItem('token', data.access_token);
-
-                // Esperamos un momento para asegurar que el token se guardó
                 await new Promise(resolve => setTimeout(resolve, 100));
 
-                // Obtener datos del usuario después del login
                 try {
-                    // Intentamos obtener los datos del usuario
                     const userData = await authService.getMe();
-                    console.log('User data:', userData);
-
-                    // Login completo con datos del usuario
                     login(data.access_token, userData);
-
                     showSnackbar('Login exitoso', 'success');
-                    // Forzar la navegación con replace
                     navigate('/dashboard', { replace: true });
-
                 } catch (userError) {
                     console.error('Error getting user data:', userError);
                     setError('Error obteniendo datos del usuario');
@@ -61,7 +59,6 @@ export const Login = () => {
             let errorMessage = 'Error en el login';
 
             if (err.response) {
-                // Handle specific API error responses
                 switch (err.response.status) {
                     case 401:
                         errorMessage = 'Credenciales inválidas';
@@ -87,63 +84,133 @@ export const Login = () => {
     return (
         <>
             <Loading open={loading} />
-            <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '100vh',
-                bgcolor: 'grey.100'
-            }}>
-                <Card sx={{ p: 4, maxWidth: 400, width: '100%' }}>
-                    <Typography variant="h5" mb={3} textAlign="center">
-                        Acceso al Sistema
-                    </Typography>
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                            fullWidth
-                            label="Email"
-                            variant="outlined"
-                            margin="normal"
-                            value={credentials.email}
-                            onChange={(e) => setCredentials({...credentials, email: e.target.value})}
-                            required
-                            type="email"
-                            autoComplete="email"
-                            inputProps={{
-                                'data-testid': 'email-input'
-                            }}
-                        />
-                        <TextField
-                            fullWidth
-                            label="Contraseña"
-                            type="password"
-                            variant="outlined"
-                            margin="normal"
-                            value={credentials.password}
-                            onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                            required
-                            autoComplete="current-password"
-                            inputProps={{
-                                'data-testid': 'password-input'
-                            }}
-                        />
-                        {error && (
-                            <Typography color="error" mt={2}>
-                                {error}
-                            </Typography>
-                        )}
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            type="submit"
-                            sx={{ mt: 3 }}
-                            disabled={loading}
-                            data-testid="login-button"
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+                    padding: 3
+                }}
+            >
+                <Paper
+                    elevation={12}
+                    sx={{
+                        maxWidth: 450,
+                        width: '100%',
+                        borderRadius: 2,
+                        overflow: 'hidden'
+                    }}
+                >
+                    <Box sx={{ p: 4 }}>
+                        <Typography
+                            variant="h4"
+                            fontWeight="bold"
+                            textAlign="center"
+                            color="primary"
+                            mb={1}
                         >
-                            Iniciar Sesión
-                        </Button>
-                    </form>
-                </Card>
+                            Bienvenido
+                        </Typography>
+
+                        <Typography
+                            variant="body1"
+                            textAlign="center"
+                            color="text.secondary"
+                            mb={4}
+                        >
+                            Ingresa tus credenciales para continuar
+                        </Typography>
+
+                        <form onSubmit={handleSubmit}>
+                            <TextField
+                                fullWidth
+                                placeholder="ejemplo@correo.com"
+                                variant="outlined"
+                                margin="normal"
+                                value={credentials.email}
+                                onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+                                required
+                                type="email"
+                                autoComplete="email"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Mail size={20} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                    }
+                                }}
+                                data-testid="email-input"
+                            />
+
+                            <TextField
+                                fullWidth
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Tu contraseña"
+                                variant="outlined"
+                                margin="normal"
+                                value={credentials.password}
+                                onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+                                required
+                                autoComplete="current-password"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Lock size={20} />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff size={20} /> : <Visibility size={20} />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: 2,
+                                    }
+                                }}
+                                data-testid="password-input"
+                            />
+
+                            {error && (
+                                <Typography color="error" mt={2} textAlign="center">
+                                    {error}
+                                </Typography>
+                            )}
+
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                type="submit"
+                                size="large"
+                                disabled={loading}
+                                sx={{
+                                    mt: 3,
+                                    mb: 2,
+                                    borderRadius: 2,
+                                    padding: '12px',
+                                    textTransform: 'none',
+                                    fontSize: '1.1rem'
+                                }}
+                                data-testid="login-button"
+                            >
+                                Iniciar Sesión
+                            </Button>
+                        </form>
+                    </Box>
+                </Paper>
             </Box>
         </>
     );

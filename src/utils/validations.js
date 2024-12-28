@@ -26,7 +26,7 @@ export const validateAndFormatInput = {
         }
 
         // Patrón que permite solo letras, espacios y tildes específicas en vocales
-        const validNamePattern = /^[a-zA-ZáéíóúÁÉÍÓÚ\s]*$/;
+        const validNamePattern = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/;
 
         if (!validNamePattern.test(name)) {
             return {

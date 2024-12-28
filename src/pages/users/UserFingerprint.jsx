@@ -101,7 +101,8 @@ import {
 } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { userService } from '../../services/userService';
-import { useSnackbar } from '../../components/common/Snackbar';
+// import { useSnackbar } from '../../components/common/Snackbar';
+import { useSnackbar } from '../../utils/hooks';
 import { biometricService } from "../../services/biometricService.js";
 
 export const UserFingerprint = () => {

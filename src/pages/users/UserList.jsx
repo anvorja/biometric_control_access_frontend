@@ -2400,7 +2400,7 @@ export const UserList = () => {
             setFilteredUsers([...data].sort((a, b) => a.id - b.id)); // Ordenamos por ID
             setLastUpdate(new Date());
         } catch (error) {
-            setError('Error al cargar usuarios. Por favor, intente nuevamente.');
+            setError('Error al cargar usuarios. Por favor, intente nuevamente. Revisar BD');
             console.error('Error fetching users:', error);
         } finally {
             setIsRefreshing(false);

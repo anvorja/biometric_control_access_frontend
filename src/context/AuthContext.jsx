@@ -1,7 +1,8 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
-import { useSnackbar } from '../components/common/Snackbar';
+// import { useSnackbar } from '../components/common/Snackbar';
+import { useSnackbar } from '../utils/hooks.js';
 
 const AuthContext = createContext(null);
 
